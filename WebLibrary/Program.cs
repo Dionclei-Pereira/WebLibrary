@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WebLibrary.Data;
 using WebLibrary.Entities;
+using WebLibrary.Services;
+using WebLibrary.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,13 +13,26 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-var connection = "server=localhost;userid=root;password=12345678;database=blognow";
-builder.Services.AddDbContext<LibraryContext>(options => options.UseNpgsql());
-builder.Services.AddIdentity<LibaryUser, IdentityRole>(options => {
-
+var connection = "server=localhost;userid=root;password=12345678;database=library";
+builder.Services.AddDbContext<LibraryContext>(options => options.UseMySql(connection, ServerVersion.AutoDetect(connection)));
+builder.Services.AddIdentity<User, IdentityRole>(options => {
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredUniqueChars = 0;
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireUppercase = false;
+    options.User.RequireUniqueEmail = true;
+    options.User.AllowedUserNameCharacters = null;
 }).AddEntityFrameworkStores<LibraryContext>().AddDefaultTokenProviders();
-var app = builder.Build();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<UserManager<User>>();
+builder.Services.AddScoped<SeedDB>();
 
+var app = builder.Build();
+using (var scope = app.Services.CreateScope()) {
+    var seed = scope.ServiceProvider.GetRequiredService<SeedDB>();
+    await seed.Seed();
+}
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -25,6 +40,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
