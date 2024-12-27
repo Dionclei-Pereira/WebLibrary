@@ -6,7 +6,7 @@ using WebLibrary.Services.Interfaces;
 
 namespace WebLibrary.Controllers {
     [ApiController]
-    [Route("/users")]
+    [Route("api/users")]
     public class UserController : ControllerBase {
         private readonly IUserService _userService;
         public UserController(SeedDB seeding, IUserService userService) {

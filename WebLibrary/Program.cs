@@ -11,8 +11,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 var connection = "server=localhost;userid=root;password=12345678;database=library";
 builder.Services.AddDbContext<LibraryContext>(options => options.UseMySql(connection, ServerVersion.AutoDetect(connection)));
 builder.Services.AddIdentity<User, IdentityRole>(options => {
@@ -25,8 +23,12 @@ builder.Services.AddIdentity<User, IdentityRole>(options => {
     options.User.AllowedUserNameCharacters = null;
 }).AddEntityFrameworkStores<LibraryContext>().AddDefaultTokenProviders();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<UserManager<User>>();
 builder.Services.AddScoped<SeedDB>();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+builder.Logging.AddConsole();
 
 var app = builder.Build();
 using (var scope = app.Services.CreateScope()) {

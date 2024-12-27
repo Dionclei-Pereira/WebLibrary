@@ -24,9 +24,15 @@ namespace WebLibrary.Data {
                 u.UserName = email;
                 u.Email = email;
                 u.Name = "Pedro Mirok";
-                 await _manager.CreateAsync(u, "IPlayMusic");
+                await _manager.CreateAsync(u, "IPlayMusic");
+            }
+            if (!_context.Books.Any()) {
+                Book b = new Book("Lorem ipsum dolor", "Dolor Doler");
+                _context.Books.Add(b);
+                b = new Book("Ea atque autem quo totam", "Quibusdam et");
+                _context.Books.Add(b);
+                _context.SaveChanges();
             }
         }
-    
     }
 }
