@@ -14,8 +14,8 @@ namespace WebLibrary.Controllers {
         }
 
         [HttpGet]
-        public ActionResult GetBooks() {
-            return Ok(_bookService.GetBooks());
+        public async Task<ActionResult> GetBooks() {
+            return Ok(await _bookService.GetBooks());
         }
     }
 }

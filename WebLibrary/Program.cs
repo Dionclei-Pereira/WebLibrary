@@ -24,6 +24,7 @@ builder.Services.AddIdentity<User, IdentityRole>(options => {
 }).AddEntityFrameworkStores<LibraryContext>().AddDefaultTokenProviders();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<ILoanService, LoanService>();
 builder.Services.AddScoped<UserManager<User>>();
 builder.Services.AddScoped<SeedDB>();
 builder.Services.AddEndpointsApiExplorer();

@@ -3,7 +3,8 @@ using WebLibrary.DTO;
 
 namespace WebLibrary.Services.Interfaces {
     public interface IBookService {
-        public List<BookDTO> GetBooks();
+        Task<List<BookDTO>> GetBooks();
+        Task<BookDTO> GetBookById(int id);
 
     }
 }

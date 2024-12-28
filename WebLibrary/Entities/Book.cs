@@ -1,4 +1,5 @@
-﻿using WebLibrary.DTO;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using WebLibrary.DTO;
 
 namespace WebLibrary.Entities {
     public class Book {
@@ -6,6 +7,9 @@ namespace WebLibrary.Entities {
         public int Id { get; set; }
         public string Name { get; set; }
         public string Author { get; set; }
+
+        [InverseProperty("Book")]
+        public Loan Loan { get; set; }
 
         public Book() {}
 

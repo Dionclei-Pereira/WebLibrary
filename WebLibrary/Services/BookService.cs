@@ -1,4 +1,5 @@
-﻿using WebLibrary.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using WebLibrary.Data;
 using WebLibrary.DTO;
 using WebLibrary.Services.Interfaces;
 
@@ -10,8 +11,13 @@ namespace WebLibrary.Services {
             _context = context;
         }
 
-        public List<BookDTO> GetBooks() {
-            return _context.Books.Select(b => b.ToDto()).ToList();
+        public async Task<BookDTO> GetBookById(int id) {
+            var book = await _context.Books.AsNoTracking().Where(b => b.Id == id).FirstOrDefaultAsync();
+            return book?.ToDto();
+        }
+
+        public async Task<List<BookDTO>> GetBooks() {
+            return await _context.Books.AsNoTracking().Select(b => b.ToDto()).ToListAsync();
         }
     }
 }

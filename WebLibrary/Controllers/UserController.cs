@@ -14,8 +14,25 @@ namespace WebLibrary.Controllers {
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<UserDTO>>> Index() {
-            return Ok(_userService.GetUsersDTO());
+        public async Task<ActionResult<List<UserDTO>>> GetUsers() {
+            return Ok(await _userService.GetUsersDTO());
+        }
+
+        [HttpGet]
+        [Route("/{email}")]
+        public async Task<ActionResult> GetUserByEmail(string email) {
+            var user = await _userService.GetUserByEmail(email);
+            if (user == null) {
+                return NotFound();
+            }
+            return Ok(user);
+        }
+
+        [HttpGet]
+        [Route("/{email}/loans")]
+        public async Task<ActionResult> GetUserLoans(string email) {
+            var loans = await _userService.GetUserLoansByEmail(email);
+            return Ok(loans);
         }
     }
 }
