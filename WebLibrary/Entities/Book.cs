@@ -21,6 +21,5 @@ namespace WebLibrary.Entities {
         public BookDTO ToDto() {
             return new BookDTO(Id, Name, Author);
         }
-
     }
 }

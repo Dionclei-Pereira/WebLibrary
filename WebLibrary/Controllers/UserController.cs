@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using WebLibrary.Data;
 using WebLibrary.DTO;
+using WebLibrary.Entities;
 using WebLibrary.Services.Interfaces;
 
 namespace WebLibrary.Controllers {
@@ -9,8 +11,11 @@ namespace WebLibrary.Controllers {
     [Route("api/users")]
     public class UserController : ControllerBase {
         private readonly IUserService _userService;
-        public UserController(SeedDB seeding, IUserService userService) {
+        private readonly UserManager<User> _userManager;
+        public UserController(SeedDB seeding, IUserService userService, UserManager<User> userManager) {
+            _userManager = userManager;
             _userService = userService;
+
         }
 
         [HttpGet]
@@ -33,6 +38,49 @@ namespace WebLibrary.Controllers {
         public async Task<ActionResult> GetUserLoans(string email) {
             var loans = await _userService.GetUserLoansByEmail(email);
             return Ok(loans);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> Insert([FromBody] UserDetails request) {
+            if (request == null || request.Email == null || request.Password == null || request.Password == null) {
+                return BadRequest();
+            }
+            User u = new User();
+            u.Email = request.Email;
+            u.UserName = request.Email;
+            u.Name = request.Name;
+            var result = await _userManager.CreateAsync(u, request.Password);
+            if (!result.Succeeded) {
+                return BadRequest(result.Errors);
+            }
+            UserDTO user = await _userService.GetUserByEmail(request.Email);
+            var uri = Url.Action(nameof(GetUserByEmail), new { email = user.Email });
+            return Created(uri, user);
+        }
+
+        [HttpPut]
+        [Route("/{Email}")]
+        public async Task<ActionResult> Update(string Email, [FromBody] UserDetails request) {
+            if (request == null) {
+                return BadRequest();
+            }
+            var user = await _userManager.FindByEmailAsync(Email);
+            if (user == null) {
+                return NotFound();
+            }
+            if (await _userManager.FindByEmailAsync(request.Email) != null && request.Email != user.Email) {
+                return BadRequest();
+            }
+            user.Email = request.Email ?? user.Email;
+            user.UserName = request.Email ?? user.UserName;
+            user.Name = request.Name ?? user.Name;
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded) {
+                return BadRequest(result.Errors);
+            }
+            var updatedUser = await _userManager.FindByEmailAsync(request.Email);
+            var uri = Url.Action(nameof(GetUserByEmail), new { email = updatedUser.Email });
+            return Created(uri, updatedUser.ToDTO());
         }
     }
 }

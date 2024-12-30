@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WebLibrary.Data;
 using WebLibrary.DTO;
+using WebLibrary.Entities;
 using WebLibrary.Services.Interfaces;
 
 namespace WebLibrary.Services {
@@ -9,6 +10,12 @@ namespace WebLibrary.Services {
         private readonly LibraryContext _context;
         public UserService(LibraryContext libraryContext) {
             _context = libraryContext;
+        }
+
+        public async Task<UserDTO> Insert(User user) {
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+            return user.ToDTO();
         }
 
         public async Task<UserDTO> GetUserByEmail(string email) {
