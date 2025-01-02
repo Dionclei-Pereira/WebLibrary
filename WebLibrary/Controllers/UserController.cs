@@ -24,7 +24,7 @@ namespace WebLibrary.Controllers {
         }
 
         [HttpGet]
-        [Route("/{email}")]
+        [Route("{email}")]
         public async Task<ActionResult> GetUserByEmail(string email) {
             var user = await _userService.GetUserByEmail(email);
             if (user == null) {
@@ -34,7 +34,7 @@ namespace WebLibrary.Controllers {
         }
 
         [HttpGet]
-        [Route("/{email}/loans")]
+        [Route("{email}/loans")]
         public async Task<ActionResult> GetUserLoans(string email) {
             var loans = await _userService.GetUserLoansByEmail(email);
             return Ok(loans);
@@ -59,7 +59,7 @@ namespace WebLibrary.Controllers {
         }
 
         [HttpPut]
-        [Route("/{Email}")]
+        [Route("{Email}")]
         public async Task<ActionResult> Update(string Email, [FromBody] UserDetails request) {
             if (request == null) {
                 return BadRequest();
