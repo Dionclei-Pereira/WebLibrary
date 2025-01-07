@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WebLibrary.Data;
-using WebLibrary.DTO;
 using WebLibrary.Entities;
+using WebLibrary.Entities.DTO;
 using WebLibrary.Services.Interfaces;
 
 namespace WebLibrary.Services {

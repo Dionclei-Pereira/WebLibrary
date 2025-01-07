@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using WebLibrary.DTO;
 using WebLibrary.Entities;
+using WebLibrary.Entities.DTO;
 using WebLibrary.Services.Interfaces;
 
 namespace WebLibrary.Controllers {

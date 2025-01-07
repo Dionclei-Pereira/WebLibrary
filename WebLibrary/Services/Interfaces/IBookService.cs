@@ -1,6 +1,6 @@
 ﻿using WebLibrary.Data;
-using WebLibrary.DTO;
 using WebLibrary.Entities;
+using WebLibrary.Entities.DTO;
 
 namespace WebLibrary.Services.Interfaces {
     public interface IBookService {

@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using WebLibrary.DTO;
+using WebLibrary.Entities.DTO;
 
 namespace WebLibrary.Entities {
     public class Book {

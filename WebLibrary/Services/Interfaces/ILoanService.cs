@@ -1,4 +1,4 @@
-﻿using WebLibrary.DTO;
+﻿using WebLibrary.Entities.DTO;
 
 namespace WebLibrary.Services.Interfaces {
     public interface ILoanService {

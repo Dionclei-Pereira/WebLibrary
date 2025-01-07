@@ -1,4 +1,4 @@
-﻿namespace WebLibrary.DTO {
+﻿namespace WebLibrary.Entities.DTO {
     public class LoanDTOWithoutUser {
 
         public int Id { get; set; }
