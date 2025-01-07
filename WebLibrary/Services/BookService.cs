@@ -13,12 +13,12 @@ namespace WebLibrary.Services {
         }
 
         public async Task<BookDTO> GetBookById(int id) {
-            var book = await _context.Books.AsNoTracking().Where(b => b.Id == id).FirstOrDefaultAsync();
+            var book = await _context.Books.AsNoTracking().Where(b => b.Id == id).Include(b => b.BookCategory).FirstOrDefaultAsync();
             return book?.ToDto();
         }
 
         public async Task<List<BookDTO>> GetBooks() {
-            return await _context.Books.AsNoTracking().Select(b => b.ToDto()).ToListAsync();
+            return await _context.Books.AsNoTracking().Include(b => b.BookCategory).Select(b => b.ToDto()).ToListAsync();
         }
 
         public async Task<BookDTO> Insert(Book book) {
