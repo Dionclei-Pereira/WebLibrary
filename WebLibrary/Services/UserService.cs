@@ -2,6 +2,7 @@
 using WebLibrary.Data;
 using WebLibrary.Entities;
 using WebLibrary.Entities.DTO;
+using WebLibrary.Services.Exceptions;
 using WebLibrary.Services.Interfaces;
 
 namespace WebLibrary.Services {
@@ -16,6 +17,11 @@ namespace WebLibrary.Services {
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
             return user.ToDTO();
+        }
+
+        public async Task<User> GetUserByEmailNoDTO(string email) {
+            var user = await _context.Users.Where(u => u.Email == email).AsNoTracking().FirstOrDefaultAsync();
+            return user;
         }
 
         public async Task<UserDTO> GetUserByEmail(string email) {
