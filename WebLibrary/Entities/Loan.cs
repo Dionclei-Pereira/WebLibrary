@@ -19,7 +19,7 @@ namespace WebLibrary.Entities {
         }
 
         public LoanDTO ToDTO() {
-            return new LoanDTO(User.ToDTO(), Book.ToDto(), DateInit, DateBack);
+            return new LoanDTO(Id, User.ToDTO(), Book.ToDto(), DateInit, DateBack);
         }
         public LoanDTOWithoutUser ToDTOWithoutUser() {
             return new LoanDTOWithoutUser(Book.ToDto(), DateInit, DateBack);

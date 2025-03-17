@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using WebLibrary.Entities;
 using WebLibrary.Entities.DTO;
 using WebLibrary.Services;
+using WebLibrary.Services.Exceptions;
 using WebLibrary.Services.Interfaces;
 
 namespace WebLibrary.Controllers {
@@ -44,9 +45,14 @@ namespace WebLibrary.Controllers {
             if (book == null) {
                 return NotFound("Book not Found");
             }
-            Loan loanCreated = await _loanService.AddLoan(user, book);
-            var uri = Url.Action(nameof(GetLoanById), new { loanId = loanCreated.Id });
-            return Created(uri, currentRequest);
+            try {
+                Loan loanCreated = await _loanService.AddLoan(user, book);
+                var uri = Url.Action(nameof(GetLoanById), new { loanId = loanCreated.Id });
+                return Created(uri, currentRequest);
+            } catch (LoanException e) {
+                return BadRequest(e.Message);
+            }
+            
         }
 
         [HttpDelete]

@@ -20,6 +20,9 @@ namespace WebLibrary.Services {
         public async Task<Loan> AddLoan(User user, Book book) {
             _context.Attach(user);
             _context.Attach(book);
+            if (book.Loan != null) {
+                throw new LoanException("The book has already been borrowed.");
+            }
             Loan loan = new Loan(user, book, DateTime.Now, DateTime.Now.AddDays(14));
             _context.Loans.Add(loan);
             await _context.SaveChangesAsync();

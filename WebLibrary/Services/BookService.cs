@@ -18,7 +18,7 @@ namespace WebLibrary.Services {
         }
 
         public async Task<Book> GetBookByIdNoDTO(int id) {
-            var book = await _context.Books.AsNoTracking().Where(b => b.Id == id).Include(b => b.BookCategory).FirstOrDefaultAsync();
+            var book = await _context.Books.AsNoTracking().Where(b => b.Id == id).Include(b => b.BookCategory).Include(b => b.Loan).FirstOrDefaultAsync();
             return book;
         }
 
