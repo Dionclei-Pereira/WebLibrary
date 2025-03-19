@@ -18,7 +18,7 @@ namespace WebLibrary.Controllers {
 
         [HttpGet]
         public async Task<ActionResult> GetPenalties() {
-            var loans = (await _loanService.GetLoans()).Where(l => l.DateBack.ToUniversalTime() < DateTime.Now.ToUniversalTime()).ToList();
+            var loans = (await _loanService.GetLoans()).Where(l => l.DateBack < DateTime.Now.ToUniversalTime()).ToList();
             return Ok(loans);
         }
 

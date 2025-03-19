@@ -9,5 +9,6 @@ namespace WebLibrary.Services.Interfaces {
         Task RemoveLoan(int loanId);
         Task<List<LoanDTO>> GetLoans();
         Task<LoanDTO> GetLoanById(int loanId);
+        Task<LoanDTO> Renew(int loanId);
     }
 }

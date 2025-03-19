@@ -45,5 +45,13 @@ namespace WebLibrary.Services {
             }
             return loan.ToDTO();
         }
+        public async Task<LoanDTO> Renew(int loanId) {
+            var loan = await _context.Loans.Where(l => l.Id == loanId).Include(l => l.User).Include(l => l.Book).FirstOrDefaultAsync() ?? throw new LoanException("Loan not Found");
+            if (loan.DateBack < DateTime.Now.ToUniversalTime()) throw new LoanException("You can't renew a book that's overdue.");
+            loan.DateBack = DateTime.Now.AddDays(15);
+            loan.DateInit = DateTime.Now;
+            await _context.SaveChangesAsync();
+            return loan.ToDTO();
+        }
     }
 }

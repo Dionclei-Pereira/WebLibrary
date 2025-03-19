@@ -55,6 +55,17 @@ namespace WebLibrary.Controllers {
             
         }
 
+        [HttpPost]
+        [Route("{loanId}/renew")]
+        public async Task<ActionResult> Renew(int loanId) {
+            try {
+                var loan = await _loanService.Renew(loanId);
+                return Ok(loan);
+            } catch (LoanException e) {
+                return BadRequest(e.Message);
+            }
+        }
+
         [HttpDelete]
         public async Task<ActionResult> RemoveLoan([FromBody] LoanDeleteRequest currentRequest) {
             await _loanService.RemoveLoan(currentRequest.loanId);
