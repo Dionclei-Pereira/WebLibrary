@@ -27,32 +27,28 @@ namespace WebLibrary.Controllers {
         [HttpGet]
         [Route("{loanId}")]
         public async Task<ActionResult> GetLoanById(int loanId) {
-            var loan = await _loanService.GetLoanById(loanId);
-            if (loan == null) {
-                return NotFound("Loan not Found");
+            try {
+                var loan = await _loanService.GetLoanById(loanId);
+                return Ok(loan);
+            } catch (Exception e) {
+                return BadRequest(e.Message);
             }
-            return Ok(loan);
 
         }
 
         [HttpPost]
         public async Task<ActionResult> AddLoan([FromBody] LoanRequest currentRequest) {
-            var user = await _userService.GetUserByEmailNoDTO(currentRequest.email);
-            if (user == null) {
-                return NotFound("User not Found"); 
-            }
-            var book = await _bookService.GetBookByIdNoDTO(currentRequest.bookId);
-            if (book == null) {
-                return NotFound("Book not Found");
-            }
             try {
+                var user = await _userService.GetUserByEmailNoDTO(currentRequest.email);
+                var book = await _bookService.GetBookByIdNoDTO(currentRequest.bookId);
                 Loan loanCreated = await _loanService.AddLoan(user, book);
                 var uri = Url.Action(nameof(GetLoanById), new { loanId = loanCreated.Id });
                 return Created(uri, currentRequest);
             } catch (LoanException e) {
                 return BadRequest(e.Message);
+            } catch (BookException e) {
+                return BadRequest(e.Message);
             }
-            
         }
 
         [HttpPost]

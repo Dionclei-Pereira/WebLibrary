@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebLibrary.Entities.DTO;
+using WebLibrary.Services.Exceptions;
 using WebLibrary.Services.Interfaces;
 
 namespace WebLibrary.Controllers {
@@ -25,44 +26,48 @@ namespace WebLibrary.Controllers {
         [HttpGet]
         [Route("{email}/penalty")]
         public async Task<ActionResult> GetUserPenality(string email) {
-            var user = await _userService.GetUserByEmail(email);
-            if (user == null) {
-                return NotFound();
+            try {
+                var user = await _userService.GetUserByEmail(email);
+                return Ok(user.Penalty);
+            } catch (UserException e) {
+                return BadRequest(e.Message);
             }
-            return Ok(user.Penalty);
         }
 
         [HttpPost]
         [Route("{email}/penalty")]
         public async Task<ActionResult> AddPenalty(string email, [FromBody] PenaltyRequest penalty) {
-            var user = await _userService.GetUserByEmail(email);
-            if (user == null) {
-                return NotFound();
+            try {
+                var user = await _userService.GetUserByEmail(email);
+                double amount = await _userService.AddPenalty(email, penalty.Amount);
+                return Ok(amount);
+            } catch (UserException e) {
+                return BadRequest(e.Message);
             }
-            double amount = await _userService.AddPenalty(email, penalty.Amount);
-            return Ok(amount);
         }
 
         [HttpDelete]
         [Route("{email}/penalty")]
         public async Task<ActionResult> ResetPenalty(string email) {
-            var user = await _userService.GetUserByEmail(email);
-            if (user == null) {
-                return NotFound();
+            try {
+                var user = await _userService.GetUserByEmail(email);
+                double amount = await _userService.ResetPenalty(email);
+                return Ok(amount);
+            } catch (UserException e) {
+                return BadRequest(e.Message);
             }
-            double amount = await _userService.ResetPenalty(email);
-            return Ok(amount);
         }
 
         [HttpPut]
         [Route("{email}/penalty")]
         public async Task<ActionResult> SetPenalty(string email, [FromBody] PenaltyRequest penalty) {
-            var user = await _userService.GetUserByEmail(email);
-            if (user == null) {
-                return NotFound();
+            try {
+                var user = await _userService.GetUserByEmail(email);
+                double amount = await _userService.SetPenalty(email, penalty.Amount);
+                return Ok(amount);
+            } catch (UserException e) {
+                return BadRequest(e.Message);
             }
-            double amount = await _userService.SetPenalty(email, penalty.Amount);
-            return Ok(amount);
         }
     }
 }

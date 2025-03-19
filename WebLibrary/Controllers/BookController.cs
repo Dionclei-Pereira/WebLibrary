@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using WebLibrary.Entities;
 using WebLibrary.Entities.DTO;
+using WebLibrary.Services.Exceptions;
 using WebLibrary.Services.Interfaces;
 
 namespace WebLibrary.Controllers {
@@ -23,11 +24,15 @@ namespace WebLibrary.Controllers {
         [HttpGet]
         [Route("{id}")]
         public async Task<ActionResult> GetBookById(int id) {
-            var resultBook = await _bookService.GetBookById(id);
-            if (resultBook == null) {
-                return NotFound();
+            try {
+                var resultBook = await _bookService.GetBookById(id);
+                if (resultBook == null) {
+                    return NotFound();
+                }
+                return Ok(resultBook);
+            } catch (BookException e) {
+                return BadRequest(e.Message);
             }
-            return Ok(resultBook);
         }
 
         [HttpPost]

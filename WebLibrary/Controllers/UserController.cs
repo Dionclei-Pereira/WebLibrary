@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using WebLibrary.Data;
 using WebLibrary.Entities;
 using WebLibrary.Entities.DTO;
+using WebLibrary.Services.Exceptions;
 using WebLibrary.Services.Interfaces;
 
 namespace WebLibrary.Controllers {
@@ -26,18 +27,23 @@ namespace WebLibrary.Controllers {
         [HttpGet]
         [Route("{email}")]
         public async Task<ActionResult> GetUserByEmail(string email) {
-            var user = await _userService.GetUserByEmail(email);
-            if (user == null) {
-                return NotFound();
+            try {
+                var user = await _userService.GetUserByEmail(email);
+                return Ok(user);
+            } catch (UserException e) {
+                return BadRequest(e.Message);
             }
-            return Ok(user);
         }
 
         [HttpGet]
         [Route("{email}/loans")]
         public async Task<ActionResult> GetUserLoans(string email) {
-            var loans = await _userService.GetUserLoansByEmail(email);
-            return Ok(loans);
+            try {
+                var loans = await _userService.GetUserLoansByEmail(email);
+                return Ok(loans);
+            } catch (UserException e) {
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpPost]
@@ -61,26 +67,27 @@ namespace WebLibrary.Controllers {
         [HttpPut]
         [Route("{Email}")]
         public async Task<ActionResult> Update(string Email, [FromBody] UserDetails request) {
-            if (request == null) {
-                return BadRequest();
+            try {
+                if (request == null) {
+                    return BadRequest();
+                }
+                var user = await _userManager.FindByEmailAsync(Email);
+                if (await _userManager.FindByEmailAsync(request.Email) != null && request.Email != user.Email) {
+                    return BadRequest();
+                }
+                user.Email = request.Email ?? user.Email;
+                user.UserName = request.Email ?? user.UserName;
+                user.Name = request.Name ?? user.Name;
+                var result = await _userManager.UpdateAsync(user);
+                if (!result.Succeeded) {
+                    return BadRequest(result.Errors);
+                }
+                var updatedUser = await _userManager.FindByEmailAsync(request.Email);
+                var uri = Url.Action(nameof(GetUserByEmail), new { email = updatedUser.Email });
+                return Created(uri, updatedUser.ToDTO());
+            } catch (Exception ex) {
+                return BadRequest(ex.Message);
             }
-            var user = await _userManager.FindByEmailAsync(Email);
-            if (user == null) {
-                return NotFound();
-            }
-            if (await _userManager.FindByEmailAsync(request.Email) != null && request.Email != user.Email) {
-                return BadRequest();
-            }
-            user.Email = request.Email ?? user.Email;
-            user.UserName = request.Email ?? user.UserName;
-            user.Name = request.Name ?? user.Name;
-            var result = await _userManager.UpdateAsync(user);
-            if (!result.Succeeded) {
-                return BadRequest(result.Errors);
-            }
-            var updatedUser = await _userManager.FindByEmailAsync(request.Email);
-            var uri = Url.Action(nameof(GetUserByEmail), new { email = updatedUser.Email });
-            return Created(uri, updatedUser.ToDTO());
         }
 
     }

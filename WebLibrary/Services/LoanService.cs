@@ -20,9 +20,7 @@ namespace WebLibrary.Services {
         public async Task<Loan> AddLoan(User user, Book book) {
             _context.Attach(user);
             _context.Attach(book);
-            if (book.Loan != null) {
-                throw new LoanException("The book has already been borrowed.");
-            }
+            if (book.Loan != null) throw new LoanException("The book has already been borrowed.");
             Loan loan = new Loan(user, book, DateTime.Now, DateTime.Now.AddDays(14));
             _context.Loans.Add(loan);
             await _context.SaveChangesAsync();
@@ -31,22 +29,17 @@ namespace WebLibrary.Services {
 
         public async Task RemoveLoan(int loanId) {
             var loan = await _context.Loans.AsNoTracking().FirstOrDefaultAsync(l => l.Id == loanId);
-            if (loan == null) {
-                return;
-            }
+            if (loan == null) throw new LoanException("Loan not found");
             _context.Loans.Remove(loan);
             await _context.SaveChangesAsync();
         }
 
         public async Task<LoanDTO> GetLoanById(int loanId) {
-            var loan = _context.Loans.AsNoTracking().Include(l => l.User).Include(l => l.Book).FirstOrDefault(l => l.Id == loanId);
-            if (loan == null) {
-                return null;
-            }
+            var loan = await _context.Loans.AsNoTracking().Include(l => l.User).Include(l => l.Book).FirstOrDefaultAsync(l => l.Id == loanId) ?? throw new LoanException("Loan not found");
             return loan.ToDTO();
         }
         public async Task<LoanDTO> Renew(int loanId) {
-            var loan = await _context.Loans.Where(l => l.Id == loanId).Include(l => l.User).Include(l => l.Book).FirstOrDefaultAsync() ?? throw new LoanException("Loan not Found");
+            var loan = await _context.Loans.Where(l => l.Id == loanId).Include(l => l.User).Include(l => l.Book).FirstOrDefaultAsync() ?? throw new LoanException("Loan not found");
             if (loan.DateBack < DateTime.Now.ToUniversalTime()) throw new LoanException("You can't renew a book that's overdue.");
             loan.DateBack = DateTime.Now.AddDays(15);
             loan.DateInit = DateTime.Now;

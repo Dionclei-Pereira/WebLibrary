@@ -20,18 +20,18 @@ namespace WebLibrary.Services {
         }
 
         public async Task<User> GetUserByEmailNoDTO(string email) {
-            var user = await _context.Users.Where(u => u.Email == email).AsNoTracking().FirstOrDefaultAsync();
+            var user = await _context.Users.Where(u => u.Email == email).AsNoTracking().FirstOrDefaultAsync() ?? throw new UserException("User not found");
             return user;
         }
 
         public async Task<UserDTO> GetUserByEmail(string email) {
-            var user = await _context.Users.Where(u => u.Email == email).AsNoTracking().FirstOrDefaultAsync();
-            return user?.ToDTO();
+            var user = await _context.Users.Where(u => u.Email == email).AsNoTracking().FirstOrDefaultAsync() ?? throw new UserException("User not found"); ;
+            return user.ToDTO();
         }
 
         public async Task<List<LoanDTOWithoutUser>> GetUserLoansByEmail(string email) {
-            var user = await _context.Users.AsNoTracking().Where(u => u.Email == email).Include(u => u.Loans).ThenInclude(l => l.Book).FirstOrDefaultAsync();
-            return user?.Loans.Select(l => l.ToDTOWithoutUser()).ToList();
+            var user = await _context.Users.AsNoTracking().Where(u => u.Email == email).Include(u => u.Loans).ThenInclude(l => l.Book).FirstOrDefaultAsync() ?? throw new UserException("User not found"); ;
+            return user.Loans.Select(l => l.ToDTOWithoutUser()).ToList();
         
         }
 
@@ -46,7 +46,7 @@ namespace WebLibrary.Services {
                 await _context.SaveChangesAsync();
                 return user.Penalty;
             }
-            return 0;
+            throw new UserException("User not found");
         }
 
         public async Task<double> SetPenalty(string email, double amount) {
@@ -56,7 +56,7 @@ namespace WebLibrary.Services {
                 await _context.SaveChangesAsync();
                 return user.Penalty;
             }
-            return 0;
+            throw new UserException("User not found");
         }
 
         public async Task<double> ResetPenalty(string email) {
@@ -65,7 +65,7 @@ namespace WebLibrary.Services {
                 user.Penalty = 0;
                 await _context.SaveChangesAsync();
             }
-            return 0;
+            throw new UserException("User not found");
         }
     }
 }
