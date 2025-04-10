@@ -4,6 +4,7 @@ using WebLibrary.Entities;
 using WebLibrary.Entities.DTO;
 using WebLibrary.Services.Exceptions;
 using WebLibrary.Services.Interfaces;
+using WebLibrary.Services.Util;
 
 namespace WebLibrary.Controllers {
     [Route("api/books")]
@@ -36,6 +37,7 @@ namespace WebLibrary.Controllers {
         }
 
         [HttpPost]
+        [AuthRequired("Admin")]
         public async Task<ActionResult> Insert([FromBody] BookDetails bookDetails) {
             Book book = new Book();
             book.Author = bookDetails.Author;

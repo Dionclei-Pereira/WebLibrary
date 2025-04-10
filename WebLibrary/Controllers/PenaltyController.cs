@@ -2,6 +2,7 @@
 using WebLibrary.Entities.DTO;
 using WebLibrary.Services.Exceptions;
 using WebLibrary.Services.Interfaces;
+using WebLibrary.Services.Util;
 
 namespace WebLibrary.Controllers {
 
@@ -18,6 +19,7 @@ namespace WebLibrary.Controllers {
         }
 
         [HttpGet]
+        [AuthRequired("Admin")]
         public async Task<ActionResult> GetPenalties() {
             var loans = (await _loanService.GetLoans()).Where(l => l.DateBack < DateTime.Now.ToUniversalTime()).ToList();
             return Ok(loans);
@@ -25,6 +27,7 @@ namespace WebLibrary.Controllers {
 
         [HttpGet]
         [Route("{email}/penalty")]
+        [AuthRequired("Admin")]
         public async Task<ActionResult> GetUserPenality(string email) {
             try {
                 var user = await _userService.GetUserByEmail(email);
@@ -36,6 +39,7 @@ namespace WebLibrary.Controllers {
 
         [HttpPost]
         [Route("{email}/penalty")]
+        [AuthRequired("Admin")]
         public async Task<ActionResult> AddPenalty(string email, [FromBody] PenaltyRequest penalty) {
             try {
                 var user = await _userService.GetUserByEmail(email);
@@ -48,6 +52,7 @@ namespace WebLibrary.Controllers {
 
         [HttpDelete]
         [Route("{email}/penalty")]
+        [AuthRequired("Admin")]
         public async Task<ActionResult> ResetPenalty(string email) {
             try {
                 var user = await _userService.GetUserByEmail(email);
@@ -60,6 +65,7 @@ namespace WebLibrary.Controllers {
 
         [HttpPut]
         [Route("{email}/penalty")]
+        [AuthRequired("Admin")]
         public async Task<ActionResult> SetPenalty(string email, [FromBody] PenaltyRequest penalty) {
             try {
                 var user = await _userService.GetUserByEmail(email);

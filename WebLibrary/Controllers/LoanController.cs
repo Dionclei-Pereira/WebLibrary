@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebLibrary.Entities;
 using WebLibrary.Entities.DTO;
 using WebLibrary.Services;
 using WebLibrary.Services.Exceptions;
 using WebLibrary.Services.Interfaces;
+using WebLibrary.Services.Util;
 
 namespace WebLibrary.Controllers {
     [Route("api/loans")]
@@ -37,6 +39,7 @@ namespace WebLibrary.Controllers {
         }
 
         [HttpPost]
+        [AuthRequired("Admin")]
         public async Task<ActionResult> AddLoan([FromBody] LoanRequest currentRequest) {
             try {
                 var user = await _userService.GetUserByEmailNoDTO(currentRequest.email);
@@ -48,11 +51,14 @@ namespace WebLibrary.Controllers {
                 return BadRequest(e.Message);
             } catch (BookException e) {
                 return BadRequest(e.Message);
+            } catch (UserException e) {
+                return BadRequest(e.Message);
             }
         }
 
         [HttpPost]
         [Route("{loanId}/renew")]
+        [AuthRequired("Admin")]
         public async Task<ActionResult> Renew(int loanId) {
             try {
                 var loan = await _loanService.Renew(loanId);
@@ -63,6 +69,7 @@ namespace WebLibrary.Controllers {
         }
 
         [HttpDelete]
+        [AuthRequired("Admin")]
         public async Task<ActionResult> RemoveLoan([FromBody] LoanDeleteRequest currentRequest) {
             await _loanService.RemoveLoan(currentRequest.loanId);
             return Ok();

@@ -24,7 +24,7 @@ namespace WebLibrary.Controllers {
             if (request.Equals == null || request.password == null) return BadRequest("Email or password is invalid");
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null || !await _userManager.CheckPasswordAsync(user, request.password)) return BadRequest("Email or password is invalid");
-            var token = _tokenService.GenerateToken(user);
+            var token = await _tokenService.GenerateToken(user);
             return Ok(token);
         }
 

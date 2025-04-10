@@ -6,6 +6,7 @@ using WebLibrary.Entities;
 using WebLibrary.Entities.DTO;
 using WebLibrary.Services.Exceptions;
 using WebLibrary.Services.Interfaces;
+using WebLibrary.Services.Util;
 
 namespace WebLibrary.Controllers {
     [ApiController]
@@ -47,6 +48,7 @@ namespace WebLibrary.Controllers {
         }
 
         [HttpPost]
+        [AuthRequired("Admin")]
         public async Task<ActionResult> Insert([FromBody] UserDetails request) {
             if (request == null || request.Email == null || request.Password == null || request.Password == null) {
                 return BadRequest();
@@ -66,6 +68,7 @@ namespace WebLibrary.Controllers {
 
         [HttpPut]
         [Route("{Email}")]
+        [AuthRequired("Admin")]
         public async Task<ActionResult> Update(string Email, [FromBody] UserDetails request) {
             try {
                 if (request == null) {

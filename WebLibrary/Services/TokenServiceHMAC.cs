@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -9,9 +10,14 @@ using WebLibrary.Services.Interfaces;
 namespace WebLibrary.Services {
     public class TokenServiceHMAC : ITokenService {
 
+        private readonly UserManager<User> _userManager;
         private readonly byte[] _key = Encoding.ASCII.GetBytes(Key.SecretKey);
 
-        public TokenDTO GenerateToken(User user) {
+        public TokenServiceHMAC(UserManager<User> userManager) {
+            _userManager = userManager;
+        }
+
+        public async Task<TokenDTO> GenerateToken(User user) {
             if (user == null) return null;
             var tokenConfig = new SecurityTokenDescriptor {
                 IssuedAt = DateTime.Now,
@@ -28,7 +34,7 @@ namespace WebLibrary.Services {
             return new TokenDTO { Token = tokenString };
         }
 
-        public TokenResult ValidateToken(string token) {
+        public async Task<TokenResult> ValidateToken(string token) {
             try {
                 var tokenHandler = new JwtSecurityTokenHandler();
 
@@ -45,9 +51,12 @@ namespace WebLibrary.Services {
                 };
                 var principal = tokenHandler.ValidateToken(token, validation, out SecurityToken validatedToken);
                 var email = principal.FindFirst("UserEmail")?.Value;
+                var user = await _userManager.FindByEmailAsync(email);
+                string role = ((await _userManager.GetRolesAsync(user)).Contains("Admin")) ? "Admin" : "User";
                 return new TokenResult {
                     IsValid = true,
-                    Email = email
+                    Email = email,
+                    Role = role
                 };
 
             } catch (Exception e) {

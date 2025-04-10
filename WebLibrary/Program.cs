@@ -27,7 +27,7 @@ builder.Services.AddIdentity<User, IdentityRole>(options => {
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<ILoanService, LoanService>();
-builder.Services.AddTransient<ITokenService, TokenServiceHMAC>();
+builder.Services.AddScoped<ITokenService, TokenServiceHMAC>();
 builder.Services.AddScoped<UserManager<User>>();
 builder.Services.AddScoped<SeedDB>();
 builder.Services.AddEndpointsApiExplorer();
@@ -60,15 +60,25 @@ builder.Services.AddSwaggerGen(c => {
 builder.Logging.AddConsole();
 
 var app = builder.Build();
-using (var scope = app.Services.CreateScope()) {
-    var seed = scope.ServiceProvider.GetRequiredService<SeedDB>();
-    await seed.Seed();
-}
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+
+using (var scope = app.Services.CreateScope()) {
+    var seed = scope.ServiceProvider.GetRequiredService<SeedDB>();
+    await seed.Seed();
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    if (!await roleManager.RoleExistsAsync("Admin")) {
+        await roleManager.CreateAsync(new IdentityRole("Admin"));
+    }
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+    var userAdmin = await userManager.FindByEmailAsync("dionclei2@gmail.com");
+    if (userAdmin != null && !(await userManager.GetRolesAsync(userAdmin)).Contains("Admin")) {
+        await userManager.AddToRoleAsync(userAdmin, "Admin");
+    }
 }
 
 app.UseMiddleware<FilterMiddleware>();
